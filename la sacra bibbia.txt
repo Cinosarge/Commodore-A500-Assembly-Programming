@@ -1,0 +1,260 @@
+Fino a 49 (inclusa)
+
+INDICE
+-----     -----     -----
++ ANNOTAZIONI
++ HARDWARE AMIGA 500
++ REGISTRI AMIGA 500
++ COMANDI ASMONE
++ M68000 ASSEMBLY - REGOLE
++ M68000 ASSEMBLY - ISTRUZIONI
++ M68000 ASSEMBLY - MODI DI INDIRIZZAMENTO
+
+
+ANNOTAZIONI
+-----     -----     -----
+M68k instruction set:	Motorola 68000 series
+Lo M68K può operare direttamente in memoria (CHIP RAM oppure FAST RAM).
+In CHIP RAM ci puoi mettere istruzioni, grafica e suoni (poiché la memoria è condivisa da M68k e chip custom). 512k
+In FAST RAM ci puoi mettere istruzioni. 512k
+Il 68000 e i chip custom accedono alla CHIP in maniera alternata.
+
+Il chipset AGA non è presente in A500. E' presente in A1200.
+Il chipset ECS non è presente in A500.
+La scheda grafica PICASSO II non c'è in A500.
+
+Le istruzioni del processore devono essere ad indirizzi pari, tipo 2, 4, 6, ossia allineati a word (16 bit) oppure va tutto in GURU.
+Il numero dei bit va letto da destra verso sinistra e partendo da 0.
+
+La rappresentazione numeri può essere in binario puro o in Ca2: dipende dal singolo programma come interpreta i valori.
+ASMONE utilizza la rappresentazione in Ca2.
+
+I floppy da 3.5" Sono a doppia FACCIA.
+Ogni faccia contiene 80 TRACCE.
+Ogni traccia contiene 11 SETTORI.
+Ogni settore è di 512 byte
+
+Normalmente un segnale in un registro è posto a 1 in condizioni di riposo.
+
+
+HARWARE AMIGA 500
+----- ----- -----
+- MOTOROLA CM68000		| Il processore
+
+- REGISTRI INDIRIZZI		| a0,a1,...,a7		| 32 bit
+- REGISTRI DATI			| d0,d1,...,d7		| 32 bit
+
+- KickStart	| Chip che contiene il sistema operativo
+- TrackDisk	| Dispositivo di controllo dei dischi
+
+- COPPER	| Coprocessore. Contenuto in un chip custom.
+		| FUNZIONI: rendering grafico, determinazione dei colori.
+		| Può controllare il Blitter.
+		| Può fregare cicli di clock al 68000.
+		| Possiede soltanto le istruzioni MOVE, WAIT, SKIP
+
+- BITPLANE	| piani di bit che sovrapponendosi danno luogo alle figure. Per fare la copperlist priva di disegni
+		| vanno disabilitati i bitplane (vedi listato CopperList/Schema)
+
+- AGNUS		| chip custom
+- PAULA		| contiene la circuiteria di alcune periferiche
+- DENISE	| chip custom
+
+- CIAA		| chip che gestisono porte parallela e seriale, dischi, modem, tastiera
+- CIAB		| chip
+
+- BLITTER	| Coprocessore. Contenuto in un chip custom.
+		| FUNZIONI: muovere grandi quantità di dati, fare animazioni
+		| disegnare velocemente linee, riempire efficientemente aree.
+		| Può fregare cicli di clock al 68000.
+
+- SPRITE (gli)	| Hardware per oggetto grafico mobile la cui immagine è completamente indipendente dallo sfondo
+- PLAYFIELD (i)	| Hardware deputato a visualizzare lo sfondo
+
+
+
+REGISTRI AMIGA 500
+-----     -----     -----
+STACK POINTER	| Il registro A7
+
+CHIP RAM	| da $000000 a $080000 (512kB)	| per altri modelli in generale gli indirizzi (address < $200000)
+CHIP CIAA	| da $bfe001 a $bfef01		| REGISTRI CUSTOM (timer, porta parallela, porta seriale, disk drives, mouse)
+CHIP CIAB	| da $bfdXXX			| REGISTRI CUSTOM (altro)
+FAST RAM	| da $c00000 a $c80000 (512kB)	| per altri modelli in generale gli indirizzi ($200000 <= address <= $c80000)
+CHIP CUSTOM	| da $dff000 a $dff1fe		| REGISTRI CUSTOM (per grafica e suoni: Paula, Agnus, Denise)
+KICK ROM	| da $fc0000 a $ffffff		| per kick 1.2 e 1.3 mentre da $f80000 per kick 2.0 e 3.0
+
+$dff100 | BPLCON0		| risoluzione grafica - sola scrittura
+$dff040 | BLTCON0 del blitter	| risoluzione grafica
+$dff006 | VHPOSR		| vertical horizontal position - sola lettura
+$dff1dc | BEAMCON0		| #$20 per PAL #$0 per NTSC
+
+$dff080 | COP1LC		| puntatore alla copperlist
+$dff088 | COPJMP1		| scrivilo o leggilo per attivare la nuova copperlist. Non fare CLR.W $dff088
+$dff180 | COLOR0 (copper)	| colore primario - sola scrittura
+$dff182 | COLOR1 (blitter)	| colore secondario - sola scrittura
+$dff1a4 | COLOR18		| colore della freccia del mouse
+
+REGISTRI COLORE | ci sono 32 registri colore: $dff180 (sfondo), $dff182, ..., $dff1be
+
+$dff016 | POTINP		| bit2 == 0 -> mouse dx premuto
+$bfe001 | CIAAPRA		| bit6 == 0 -> mouse sx premuto
+
+
+
+COMANDI ASMONE
+-----     -----     -----
+ESC	| permette di passare dallo EDITOR allo ASSEMBLATORE/MONITOR
+A	| comando per assemblare
+AD	| assembla e fai debug
+J	| saltare alla routine appena compilata (JSR)
+M	| M contatore	| visualizza i valori effettivi contenuti negli indirizzi di memoria in formato di bytes in esadecimale
+	|		| per avanzare premi enter, per uscire premi ESC
+
+=C	| =C 100	| dà una spiegazione del registro del COPPER $dff100
+	|		| senza parametro restituisce la descrizione di tutti i registri
+
+?	| ?$80000	| converte un numero negli altri sistemi di numerazione
+	| ?"a"		| $61 - converte una carattere nel corrispondente codice ASCII
+=R	| =R		| permette di visualizzare contenuto della memoria
+D	| D main	| permette di ottenere codice macchina e disassemblato della memoria a partire dalla label "main"
+CS	|		| permette di creare le SINUSTAB
+
+
+M68000 ASSEMBLY - REGOLE
+-----     -----     -----
++ Formati
+   Il byte (.b) oppure (.s) - l'ultima versione usata solo con bra, bsr, beq, bne (vuol dire short).
+      Viene trasformato in .w quando la distanza tra un salto e una etichetta è maggiore di 128 bytes.
+      Le istruzioni .s sono più veloci e occupano meno bytes.
+
+   La word (.w) misura 16 bit (2 byte).
+   La longword (.l) misura 32 bit (4 byte).
+   I formati possono essere aggiunti come suffisso alle istruzioni.
+
++ Sintassi
+   I numeri esadecimali sono preceduti da un $
+   I numeri binari sono preceduti da un %
+   I numeri dedimali non sono preceduti da nulla
+   Un numero preceduto da $ % o niente viene interpretato come indirizzo: se vuoi usarlo come operando deve essere preceduto da # (es. #$abc123)
+   Il simbolo # prima di una label indica l'indirizzo della label assunto come operando.
+   Le istruzioni devono essere precedute da uno spazio
+   I commenti cominciano con un ;
+   Il formato dei colori è $0RGB cioè la word del registro è divisa in RED, GREEN e BLU, in 16 toni per colore
+
+
++ Label
+   Le label vanno annotate ad inizio riga e terminano con : .
+   Una label rappresenta l'indirizzo dell'istruzione che la segue.
+   Oltre che al codice, si può dare una label a una figura o ad una musica.
+
++ Commenti
+   I commenti possono cominciano con il ; .
+
+
++ Indirizzi
+   Un indirizzo è sempre lungo una longword (32 bit) e si deve operare con il suffisso longword.
+   Con i registri indirizzi del M68K si può operare come word o longword.
+   Con i registri dati non ci sono restrizioni.
+
+M68000 ASSEMBLY - ISTRUZIONI
+-----     -----     -----
+
++ Operazioni Aritmetiche
+   ADD	|
+   SUB	| sub #10, ENERGIA
+
+   ADDQ	| Per numeri minori di 9. Supporta il suffisso .W invece di .L se si opera su registri indirizzo
+	| con operandi inferiori a #FFFF
+   SUBQ	| Per numeri minori di 9. Supporta il suffisso .W invece di .L se si opera su registri indirizzo
+	| con operandi inferiori a #FFFF
+
+   MULS	|
+   DIVS	|
+
+   MULU	|
+   DIVU	|
+
++ Operazioni logiche
+   OR	| or
+   AND	| 
+   NOT	| 
+
++ Operazioni sulla memoria
+   MOVE	| move.l $10, $20	|(l'assegnazione è da sinistra a destra, al contrario della consuetudine)
+	| move.l #$50000, LB1	| copia l'operando immediato $50000 (32bit) a partire dall'etichetta LB1
+
+   MOVEQ| moveq #6,d0	| Per numeri inferiori a $7f (127) e non minori di -128. Equivale a move.l #6, d0
+			| Non supporta suffissi.
+
+   CLR	| clr.l $10	| elimina una longword a partire dal byte 10 in chip ram
+   DC	| dc.b $30	| declare assegna al byte indicato dalla label precedente il valore $30
+   DCB	| dcb.b 200,0	| dichiara 200 bytes $00
+
++ Operazioni sulle stringhe
+  DC	| dc.b "str", 0	| memorizza la stringa a partire dal byte indicato dalla label precedente
+
++ Salti incondizionati
+   BSR	| bsr label	| Branch to Subroutine (con RTS ritorno all'istruzione successiva al JSR)
+   JSR	| jsr label	| come BSR
+
+   JMP	| jmp $40000	| Jump (con RTS non ritorna all'istruzione successiva a JMP)
+   BRA	| bra label	| come JMP
+   
+   RTS	| rts		| ReTurn from Subroutine - Restituisce il controllo al chiamante
+
+   DBRA | DBRA d0, loop	| ritorna all'etichetta loop un numero di volte pari a d0 + 1
+
++ Confronto
+   CMP	| cmp.b lab1, lab2 	| confronta due registri, di solito è seguito da un salto condizionato
+   TST	| tst.b LABEL30		| confronta rispetto a 0, di solito è eseguito da un salto condizionato
+   BTST	| BTST #5, $dff100	| confronta il bit di peso 5 del registro $dff100 con 0
+
+   Nota: queste istruzioni scrivono nello ST (Status Register) il risultato del confronto
+
++ Salti condizionati
+   BEQ 	| beq label		| branch if equal (con RTS non ritorna all'istruzione successiva al BEQ)
+   BNE	| bne label		| branch if not equal (con RTS non ritorna all'istruzione successiva al BNE)
+
+   Nota: queste istruzioni leggolo lo ST (Status Register) per decidere quale ramo prendere
+
++ Altre istruzioni
+   NOP	| nop			| No OPeration, non fa nulla
+
++ Operazioni sui reigistri indirizzi A0, A1, ...
+   LEA	| lea $50000, a0	| (Load Entire Address) equivale a move.l #$50000,a0 - non supporta suffissi.
+	| lea $dff006, a0	| Tratta il primo operando come immediato, quindi sposta il
+	|			| valore esadecimale DFF006 in A0
+				| E' più veloce di MOVE ma può essere usata solo con gli indirizzi.
+
+
+
+M68000 ASSEMBLY - MODI DI INDIRIZZAMENTO
+-----     -----     -----
++ Con label
+   clr.b Pippo
+
++ Diretto
+   move.l a0,a1
+
++ Indiretto
+   move.l (a0),d0	| copia la longword referenziata dall'indirizzo a0 verso d0
+			| si noti che è diverso da move.l a0, d0 che copia il contenuto di a0
+
++ Indiretto con post-incremento
+   move.l (a0)+,d0
+
++ Indiretto con pre-decremento
+   move.l -(a0),d0
+
++ Assoluto
+   move.l #LABEL,D0
+   move.l #10,d4
+
++ Indiretto con distanza [pagina 39(29) per dettagli]
+   move.l 50(a0),d0
+
++ Indiretto con distanza e indice [pag 39(29) per dettagli]
+   move.l 50(a0,d0), label
+
+
