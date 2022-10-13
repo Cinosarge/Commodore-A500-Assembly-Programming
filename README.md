@@ -17,10 +17,11 @@ Il mio tentativo qui non è quello di sintetizzare il lavoro di Randy/Ramjam ma 
 Quello che si ottiene da una conoscenza del genere è “riempire” in qualche modo quel gap tra hardware e software e mostrare come esista un punto in cui hardware e software coesistono, di come sia possibile fare cose anche molto complesse inserendo valori in registri di macchine.
 
 ## Indice dei contenuti
-- File 1 - Configurazione di un ambiente di emulazione
-- File 2 - L'assembly del processore M68K
-- File 3 - Hardware Amiga
-- File 4 - CopperList
+- **File 1 - Configurazione di un ambiente di emulazione**
+- **File 2 - L'assembly del processore M68K**
+- **File 3 - Hardware Amiga**
+- **File 4 - CopperList**
+- **bible** tutto quello che c'è da sapere sull'amiga
 - _more to come and soon... probably..._
 
 ## Copyright
