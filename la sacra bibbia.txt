@@ -1,13 +1,16 @@
-# INDICE
-- 1. ANNOTAZIONI
-- 2. HARDWARE AMIGA 500
-- 3. REGISTRI AMIGA 500
-- 4. COMANDI ASMONE
-- 5. M68000 ASSEMBLY - REGOLE
-- 6. M68000 ASSEMBLY - ISTRUZIONI
-- 7. M68000 ASSEMBLY - MODI DI INDIRIZZAMENTO
+INDICE
+----- ----- -----
+1. ANNOTAZIONI
+2. HARDWARE AMIGA 500
+3. REGISTRI AMIGA 500
+4. COMANDI ASMONE
+5. M68000 ASSEMBLY - REGOLE
+6. M68000 ASSEMBLY - ISTRUZIONI
+7. M68000 ASSEMBLY - MODI DI INDIRIZZAMENTO
 
-# 1. ANNOTAZIONI
+
+1. ANNOTAZIONI
+----- ----- -----
 M68k instruction set:	Motorola 68000 series
 Lo M68K può operare direttamente in memoria (CHIP RAM oppure FAST RAM).
 In CHIP RAM ci puoi mettere istruzioni, grafica e suoni (poiché la memoria è condivisa da M68k e chip custom). 512k
@@ -31,7 +34,9 @@ Ogni settore è di 512 byte
 
 Normalmente un segnale in un registro è posto a 1 in condizioni di riposo.
 
-# 2. HARWARE AMIGA 500
+
+2. HARWARE AMIGA 500
+----- ----- -----
 - MOTOROLA CM68000		| Il processore
 
 - REGISTRI INDIRIZZI		| a0,a1,...,a7		| 32 bit
@@ -65,7 +70,8 @@ Normalmente un segnale in un registro è posto a 1 in condizioni di riposo.
 - PLAYFIELD (i)	| Hardware deputato a visualizzare lo sfondo
 
 
-# 3. REGISTRI AMIGA 500
+3. REGISTRI AMIGA 500
+----- ----- -----
 STACK POINTER	| Il registro A7
 
 CHIP RAM	| da $000000 a $080000 (512kB)	| per altri modelli in generale gli indirizzi (address < $200000)
@@ -91,7 +97,9 @@ REGISTRI COLORE | ci sono 32 registri colore: $dff180 (sfondo), $dff182, ..., $d
 $dff016 | POTINP		| bit2 == 0 -> mouse dx premuto
 $bfe001 | CIAAPRA		| bit6 == 0 -> mouse sx premuto
 
+
 4. COMANDI ASMONE
+----- ----- -----
 ESC	| permette di passare dallo EDITOR allo ASSEMBLATORE/MONITOR
 A	| comando per assemblare
 AD	| assembla e fai debug
@@ -110,7 +118,8 @@ CS	|		| permette di creare le SINUSTAB
 ID	|		|
 
 
-#5. M68000 ASSEMBLY - REGOLE
+5. M68000 ASSEMBLY - REGOLE
+----- ----- -----
 + Formati
    Il byte (.b) oppure (.s) - l'ultima versione usata solo con bra, bsr, beq, bne (vuol dire short).
       Viene trasformato in .w quando la distanza tra un salto e una etichetta è maggiore di 128 bytes.
@@ -144,7 +153,9 @@ ID	|		|
    Con i registri indirizzi del M68K si può operare come word o longword.
    Con i registri dati non ci sono restrizioni.
 
-# 6. M68000 ASSEMBLY - ISTRUZIONI
+
+6. M68000 ASSEMBLY - ISTRUZIONI
+----- ----- -----
 + Operazioni Aritmetiche
    ADD	|
    SUB	| sub #10, ENERGIA
@@ -212,7 +223,8 @@ ID	|		|
 	|			| valore esadecimale DFF006 in A0
 				| E' più veloce di MOVE ma può essere usata solo con gli indirizzi.
 
-# 7. M68000 ASSEMBLY - MODI DI INDIRIZZAMENTO
+
+7. M68000 ASSEMBLY - MODI DI INDIRIZZAMENTO
 -----     -----     -----
 + Con label
    clr.b Pippo
